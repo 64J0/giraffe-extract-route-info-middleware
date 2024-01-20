@@ -2,3 +2,11 @@
 #+AUTHOR: 64J0
 
 TODO
+
+#+BEGIN_SRC bash :tangle no
+  dotnet run
+  
+  curl localhost:3000/ping
+  curl localhost:3000/users/abc
+  curl localhost:3000/users/abc/123
+#+END_SRC
