@@ -69,3 +69,10 @@ If you want something more explicit you can use:
 I personally think this approach is more ugly since it's more verbose, and the
 anonymous function is a bad pattern. But for simple scenarios I would probably
 use it.
+
+You can also use a named function instead of the anonymous one, but it's less
+generic than the ~extractRouteInfo~ middleware. You'd need to have N
+implementations depending on the middlewares combination. Another named function
+approach would be to receive a sequence of the middlewares and compose it later,
+but I think this would make the code more complex, and dissonant from the common
+Giraffe middleware composition with ~>=>~.
