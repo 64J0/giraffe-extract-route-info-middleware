@@ -9,10 +9,14 @@ let FAILURE_CODE = 1
 
 let webApp =
     choose
-        [ route "/ping" >=> setStatusCode 200 >=> Handlers.Ping.GET.ping
-          routef "/users/%s" Middlewares.extractRouteInfo
+        [ GET >=> route "/ping" >=> setStatusCode 200 >=> text "pong"
+
+          GET
+          >=> routef "/users/%s" Middlewares.extractRouteInfo
           >=> Handlers.User.GET.printUserId
-          routef "/users/%s/%s" Middlewares.extractRouteInfo
+
+          GET
+          >=> routef "/users/%s/%s" Middlewares.extractRouteInfo
           >=> Handlers.User.GET.printUserIdAndProductId
 
           // If none of the routes matched then return a 404
