@@ -1,12 +1,65 @@
 #+TITLE: Giraffe middleware to extract route information
-#+AUTHOR: 64J0
+#+DATE: [2024-01-21 dom]
+#+AUTHOR: 64J0 <https://github.com/64J0>
 
-TODO
+This project holds a POC code for a [[https://github.com/giraffe-fsharp/Giraffe][Giraffe]] middleware that extracts the route
+information, for example, part of the dynamic path defined in [[https://giraffe.wiki/docs#routing][routef]], and adds
+it to the request HTTP context object. This way, the next middlewares on the
+request flow could get this value in case they need it.
+
+The middleware configuration is basically:
+
+#+BEGIN_SRC fsharp
+  open Microsoft.AspNetCore.Http
+  open Giraffe
+
+  /// Extract the dynamic route information and add to the
+  /// HTTP context object
+  let extractRouteInfo (args: 'T) : HttpHandler =
+      fun (next: HttpFunc) (ctx: HttpContext) ->
+          ctx.Items.Add("routeInfo", args)
+          next ctx
+
+  /// Helper function that extracts the dynamic route information
+  /// from the HTTP context object
+  let getRouteInfo<'T> (ctx: HttpContext) : Result<'T, string> =
+      let routeInfo = ctx.Items.TryGetValue "routeInfo"
+
+      match routeInfo with
+      | true, info -> Ok(info :?> 'T)
+      | false, _ -> Error "Route info not available"
+#+END_SRC
+
+And to use it:
+
+#+BEGIN_SRC fsharp
+  // Notice that it's used as the first middleware for the dynamic
+  // routef http handler
+  routef "/users/%s" Middlewares.extractRouteInfo >=> validateA >=> validateB >=> endpointHandler
+  // ....
+#+END_SRC
+
+** How to run this project
 
 #+BEGIN_SRC bash :tangle no
+  # start the server
   dotnet run
-  
+
+  # on another terminal...
+  # reach the API endpoints
   curl localhost:3000/ping
   curl localhost:3000/users/abc
   curl localhost:3000/users/abc/123
+#+END_SRC
+
+** Alternatives
+
+Notice that this option is not the most functional, since it leverages a side
+effect. If you want something more functional, although I personally think it's
+more ugly (more verbose, and the anonymous function is weird), you can use:
+
+#+BEGIN_SRC fsharp
+  // Assuming that only the `validateA' and `endpointHandler' demands
+  // the dynamic route information
+  routef "/users/%s" (fun input -> validateA input >=> validateB >=> endpointHandler input)
 #+END_SRC
