@@ -39,6 +39,10 @@ And to use it:
   // ....
 #+END_SRC
 
+Notice that this middleware is still aligned with the functional paradigm since
+it's a [[https://en.wikipedia.org/wiki/Pure_function][pure function]]. If you want to check a simple alternative that uses an
+anonymous function just keep reading this README.
+
 ** How to run this project
 
 #+BEGIN_SRC bash :tangle no
@@ -54,12 +58,14 @@ And to use it:
 
 ** Alternatives
 
-Notice that this option is not the most functional, since it leverages a side
-effect. If you want something more functional, although I personally think it's
-more ugly (more verbose, and the anonymous function is weird), you can use:
+If you want something more explicit you can use:
 
 #+BEGIN_SRC fsharp
   // Assuming that only the `validateA' and `endpointHandler' demands
   // the dynamic route information
   routef "/users/%s" (fun input -> validateA input >=> validateB >=> endpointHandler input)
 #+END_SRC
+
+I personally think this approach is more ugly since it's more verbose, and the
+anonymous function is a bad pattern. But for simple scenarios I would probably
+use it.
